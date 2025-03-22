@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Orders</title>
+</head>
+<body>
+    <h2>Pizza Orders</h2>
+    <table border="1">
+        <tr>
+            <th>Type</th>
+            <th>Crust</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Price Per</th>
+            <th>Subtotal</th>
+            <th>Delivery Charge</th>
+            <th>Total</th>
+            <th>Order Date</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.type }}</td>
+            <td>{{ order.crust }}</td>
+            <td>{{ order.size }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>${{ "%.2f"|format(order.price_per) }}</td>
+            <td>${{ "%.2f"|format(order.subtotal) }}</td>
+            <td>${{ "%.2f"|format(order.delivery_charge) }}</td>
+            <td>${{ "%.2f"|format(order.total) }}</td>
+            <td>{{ order.order_date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

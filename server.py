@@ -33,7 +33,7 @@ def add_user(email, role, password):
 
     users.append(new_user)  # Add new user to the list
 
-    # Correct indentation for writing back to the file
+    
     with open('./data/user.json', 'w') as json_file:
         json.dump(users, json_file, indent=4)  # Write the entire updated list
 
@@ -46,9 +46,9 @@ def login():
         return render_template('login.html', form = form)
     elif request.method == 'POST':
         if form.validate_on_submit():  # Check if the form is submitted and valid
-            username = form.name.data  # Access the name field from the form
-            password = form.password.data  # Access the password field from the form
-            email = form.email.data  # Access the email field from the form
+            username = form.name.data  
+            password = form.password.data 
+            email = form.email.data  
             role = form.role.data
             
             user_found=check_login(email, password)
@@ -86,11 +86,11 @@ def logout():
      session.remove('username') 
      session.remove('role')
 
-@app.route('/orders')
+@app.route('/')
 def pizza_orders():
     """Fetches orders, processes them, and passes data to template"""
-    orders_data = get_file('./data/pizzaorders.json')  # Load JSON data
-    orders_list = []  # Store processed orders
+    orders_data = get_file('./data/pizzaorders.json')  
+    orders_list = []  
 
     for order in orders_data:
         order_info = {
