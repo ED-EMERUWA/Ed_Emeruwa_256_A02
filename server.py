@@ -60,6 +60,54 @@ def login():
                 return render_template('login.html', form=form)
 
 
+
+@app.route('/create', methods =['GET', 'POST'])
+def create():
+    form = SignupForm()
+    if request.method == 'GET':
+        return render_template('signup.html', form = form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            email = form.email.data
+            password = form.password.data
+            role = form.role.data
+            print(email)
+
+            add_user(email,role,password)
+            return redirect(url_for('success'))  
+
+# change to actual home page
+@app.route('/success')
+def success():
+    return "<h1>Account Created Successfully!</h1>"
+            
+@app.route('/logout')
+def logout():
+     session.remove('username') 
+     session.remove('role')
+
+@app.route('/orders')
+def pizza_orders():
+    """Fetches orders, processes them, and passes data to template"""
+    orders_data = get_file('./data/pizzaorders.json')  # Load JSON data
+    orders_list = []  # Store processed orders
+
+    for order in orders_data:
+        order_info = {
+            "type": order["type"],
+            "crust": order["crust"],
+            "size": order["size"],
+            "quantity": int(order["quantity"]),
+            "price_per": float(order["price_per"]),
+            "order_date": order["order_date"],
+            "subtotal": float(order["price_per"]) * int(order["quantity"]),
+        }
+        order_info["delivery_charge"] = order_info["subtotal"] * 0.1  # 10% delivery charge
+        order_info["total"] = order_info["subtotal"] * 1.1  # Total = subtotal + 10%
+
+        orders_list.append(order_info)  # Add to list
+
+    return render_template('pizza_orders.html', orders=orders_list)
         
             
 
