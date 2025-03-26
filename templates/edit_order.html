@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order a Pizza</title>
+</head>
+<body>
+    <h2>Order a New Pizza</h2>
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <label for="type">{{ form.type.label }}</label>
+        {{ form.type(id="orderType") }}<br><br>
+
+        <label for="crust">{{ form.crust.label }}</label>
+        {{ form.crust(id="orderCrust") }}<br><br>
+
+        <label for="size">{{ form.size.label }}</label>
+        {{ form.size(id="orderSize") }}<br><br>
+
+        <label for="quantity">{{ form.quantity.label }}</label>
+        {{ form.quantity(id="orderQuantity") }}<br><br>
+
+        <label for="order_date">{{ form.order_date.label }}</label>
+        {{ form.order_date(id="orderDate") }}<br><br>
+
+    </form>
+    
+    <br>
+    <a href="{{ url_for('pizza_orders') }}">
+        <button id="updateOrder" style="padding:10px 15px; font-size:16px; cursor:pointer;">
+            Update Order
+        </button>
+    </a>
+
+    <script>
+        var order = {{ order | tojson }};
+    
+        if (order) {
+            document.getElementById("orderType").value = order.type;
+            document.getElementById("orderCrust").value = order.crust;
+            document.getElementById("orderSize").value = order.size;
+            document.getElementById("orderQuantity").value = order.quantity;
+            document.getElementById("orderDate").value = order.order_date;
+        }
+    
+        
+        function getUpdatedOrder() {
+            return {
+                id: order.id,  // Keep the same order ID
+                type: document.getElementById("orderType").value,
+                crust: document.getElementById("orderCrust").value,
+                size: document.getElementById("orderSize").value,
+                quantity: parseInt(document.getElementById("orderQuantity").value, 10), // Ensure it's an integer
+                order_date: document.getElementById("orderDate").value
+            };
+        }
+    
+        // Function to send PUT request
+        async function updateOrder() {
+            const updatedOrder = getUpdatedOrder();
+            console.log(updateOrder)
+    
+            const response = await fetch(`http://127.0.0.1:6005/pizza`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(updatedOrder)
+            });
+    
+            if (response.ok) {
+                alert("Order updated successfully!");
+
+            } else {
+                alert("Failed to update order.");
+            }
+        }
+    
+        // Attach event listener to button
+        document.getElementById("updateOrder").addEventListener("click", updateOrder);
+    </script>
+    
+</body>
+</html>

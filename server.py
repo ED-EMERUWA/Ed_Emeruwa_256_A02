@@ -1,6 +1,8 @@
-from flask import Flask, render_template, url_for, redirect, request, session, abort
+from flask import Flask, render_template, url_for, redirect, request, session, abort, jsonify
+import json
 from login_form import LoginForm
 from signup_form import SignupForm
+from order_form import PizzaOrderForm
 import os
 import json
 from dotenv import load_dotenv  
@@ -94,6 +96,7 @@ def pizza_orders():
 
     for order in orders_data:
         order_info = {
+            "id": order["id"],
             "type": order["type"],
             "crust": order["crust"],
             "size": order["size"],
@@ -109,7 +112,79 @@ def pizza_orders():
 
     return render_template('pizza_orders.html', orders=orders_list)
         
+@app.route('/pizza', methods=['GET', 'POST', 'PUT'])
+def pizza():
+    form = PizzaOrderForm()
+    if request.method == 'GET':
+        if request.args.get('order_id'):
             
+            order_id = int(request.args.get('order_id'))
+            orders = get_file('./data/pizzaorders.json')  
+
+            for order in orders:
+                if order_id == order["id"]:
+                    return render_template('edit_order.html', order = order, form =form)
+                    
+        else: 
+            return render_template('order_form.html', form = form)  
+    elif request.method == 'PUT':       
+         try:
+            # Load existing orders
+            with open('./data/pizzaorders.json', 'r') as file:
+                orders = json.load(file)
+
+            # Get updated order data from the request
+            updated_order = request.get_json()
+            order_id = int(updated_order["id"])
+
+            # Find and update the order
+            for order in orders:
+                if order["id"] == order_id:
+                    order.update(updated_order)
+                    break  
+
+            # Save updated orders back to file
+            with open('./data/pizzaorders.json', 'w') as file:
+                json.dump(orders, file, indent=4)
+
+            return jsonify({"message": "Order updated successfully!"}), 200
+
+         except Exception as e:
+             return jsonify({"error": str(e)}), 500
+           
+                
+
+                    
+                    
+                    
+# rey=turn edit form form sgpuld have default values of order when the form is submited the js gets all values turn to json and the backen replaces the order with that oneth at is returned
+
+         
+       
+    if request.method == 'POST':
+     if form.validate_on_submit():
+         orders = get_file('./data/pizzaorders.json')
+         order_id = len(orders) + 1  # Generate a new order ID
+
+         new_order = {
+             "id": order_id,
+             "type": form.type.data,
+             "crust": form.crust.data,
+             "size": form.size.data,
+             "quantity": form.quantity.data,
+             "price_per": 75.5,
+             "order_date" : str(form.order_date.data)
+             }
+
+
+
+         orders.append(new_order)
+         with open('./data/pizzaorders.json', 'w') as file:
+             json.dump( orders, file, indent=4)
+
+         return redirect(url_for('pizza_orders'))  # Redirect to orders page
+
+     return render_template('order_form.html', form=form)           
 
 
 

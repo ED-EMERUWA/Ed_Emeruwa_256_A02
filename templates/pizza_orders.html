@@ -18,6 +18,7 @@
             <th>Delivery Charge</th>
             <th>Total</th>
             <th>Order Date</th>
+            <th>Eidt</th>
         </tr>
         {% for order in orders %}
         <tr>
@@ -30,8 +31,12 @@
             <td>${{ "%.2f"|format(order.delivery_charge) }}</td>
             <td>${{ "%.2f"|format(order.total) }}</td>
             <td>{{ order.order_date }}</td>
+            <td>{{order.id}}</td>
+            <td><a href="{{ url_for('pizza', order_id=order.id) }}"> Edit </a></td>
+            <td><a href="{{ url_for('delete', order_id=order.id) }}"> delete </a></td>td>
         </tr>
         {% endfor %}
+        <a href="{{ url_for('pizza') }}"> order </a>
     </table>
 </body>
 </html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order a Pizza</title>
+</head>
+<body>
+    <h2>Order a New Pizza</h2>
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <label for="type">{{ form.type.label }}</label>
+        {{ form.type() }}<br><br>
+
+        <label for="crust">{{ form.crust.label }}</label>
+        {{ form.crust() }}<br><br>
+
+        <label for="size">{{ form.size.label }}</label>
+        {{ form.size() }}<br><br>
+
+        <label for="quantity">{{ form.quantity.label }}</label>
+        {{ form.quantity() }}<br><br>
+
+        <label for="order_date">{{ form.order_date.label }}</label>
+        {{ form.order_date() }}<br><br>
+
+        {{ form.submit() }}
+    </form>
+    
+    <br>
+    <a href="{{ url_for('pizza_orders') }}">
+        <button style="padding:10px 15px; font-size:16px; cursor:pointer;">Back to Orders</button>
+    </a>
+</body>
+</html>
