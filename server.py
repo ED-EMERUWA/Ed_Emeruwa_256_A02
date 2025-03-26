@@ -9,6 +9,12 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key' 
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# Helper function to check if user is logged in
+def check_login_required():
+    if 'username' not in session:  # If session doesn't have 'username'
+        return redirect(url_for('login'))  # Redirect to login page
 
 def get_file(file):
     with open(file, 'r') as whole_file:
@@ -35,33 +41,33 @@ def add_user(email, role, password):
 
     users.append(new_user)  # Add new user to the list
 
-    
     with open('./data/user.json', 'w') as json_file:
         json.dump(users, json_file, indent=4)  # Write the entire updated list
 
-    
 @app.route('/login', methods =['GET', 'POST'])
 def login():
-    # if not session.get('username') and session.get('username'):
     form = LoginForm()
     if request.method == 'GET':
         return render_template('login.html', form = form)
     elif request.method == 'POST':
+        
         if form.validate_on_submit():  # Check if the form is submitted and valid
             username = form.name.data  
             password = form.password.data 
             email = form.email.data  
             role = form.role.data
             
-            user_found=check_login(email, password)
+            user_found = check_login(email, password)
 
-            if user_found :
+            if user_found:
                 session['username'] = username
                 session['role'] = role
+                return redirect(url_for('pizza_orders'))  # Redirect to pizza orders page after login
             else:
-                return render_template('login.html', form=form)
-
-
+                return render_template('login.html', form=form, error="Invalid user credentials")
+            
+        else:
+            return render_template('login.html', form=form, error="Invalid user credentials")
 
 @app.route('/create', methods =['GET', 'POST'])
 def create():
@@ -69,28 +75,34 @@ def create():
     if request.method == 'GET':
         return render_template('signup.html', form = form)
     elif request.method == 'POST':
-        if form.validate_on_submit():
-            email = form.email.data
-            password = form.password.data
-            role = form.role.data
-            print(email)
+        if form.password.data != form.confirm_password.data:
+        
+            error_message = "Passwords don't match!"
+            return render_template('signup.html', form=form, error=error_message)
+        if "@" not in form.email.data or "." not in form.email.data:
+            error_message = "Invalid email"
+            return render_template('signup.html', form=form, error=error_message)
+        else:
+            if form.validate_on_submit():
+                email = form.email.data
+                password = form.password.data
+                role = form.role.data
+                print(email)
 
-            add_user(email,role,password)
-            return redirect(url_for('success'))  
+                add_user(email, role, password)
+                return redirect(url_for('pizza_orders'))
 
-# change to actual home page
-@app.route('/success')
-def success():
-    return "<h1>Account Created Successfully!</h1>"
-            
 @app.route('/logout')
 def logout():
-     session.remove('username') 
-     session.remove('role')
+     session.pop('username', None)
+     session.pop('role', None)
+     return redirect(url_for('login'))  # Redirect to login page after logout
 
 @app.route('/')
 def pizza_orders():
-    """Fetches orders, processes them, and passes data to template"""
+    if check_login_required():  
+        return check_login_required()  
+
     orders_data = get_file('./data/pizzaorders.json')  
     orders_list = []  
 
@@ -111,9 +123,12 @@ def pizza_orders():
         orders_list.append(order_info)  # Add to list
 
     return render_template('pizza_orders.html', orders=orders_list)
-        
+
 @app.route('/pizza', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def pizza():
+    if check_login_required():  
+        return check_login_required() 
+
     form = PizzaOrderForm()
     if request.method == 'GET':
         if request.args.get('order_id'):
@@ -127,6 +142,29 @@ def pizza():
                     
         else: 
             return render_template('order_form.html', form = form)  
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            orders = get_file('./data/pizzaorders.json')
+            order_id = len(orders) + 1  # Generate a new order ID
+            if form.quantity.data > 10:
+                form.quantity.data = 10
+
+            new_order = {
+                "id": order_id,
+                "type": form.type.data,
+                "crust": form.crust.data,
+                "size": form.size.data,
+                "quantity": form.quantity.data,
+                "price_per": 75.5,
+                "order_date" : str(form.order_date.data)
+            }
+
+            orders.append(new_order)
+            with open('./data/pizzaorders.json', 'w') as file:
+                json.dump(orders, file, indent=4)
+
+            return redirect(url_for('pizza_orders')) 
+
     elif request.method == 'PUT':       
          try:
             # Load existing orders
@@ -151,66 +189,44 @@ def pizza():
 
          except Exception as e:
              return jsonify({"error": str(e)}), 500
+         
     elif request.method == 'DELETE':  
         try:
             del_order = request.get_json()
             del_order_id = int(del_order["id"])
 
-            
+            # Load existing orders
             with open('./data/pizzaorders.json', 'r') as file:
                 orders = json.load(file)
 
-            # Compresssion
+            # Remove the order with the matching ID
             orders = [order for order in orders if order["id"] != del_order_id]
 
-            
+            # Save updated orders back to file
             with open('./data/pizzaorders.json', 'w') as file:
                 json.dump(orders, file, indent=4)
 
-            return redirect(url_for('pizza_orders'))
+            return jsonify({"message": "Order deleted successfully!"}), 200
 
         except Exception as e:
             return {"error": str(e)}, 500
 
-    if request.method == 'POST':
-     if form.validate_on_submit():
-         orders = get_file('./data/pizzaorders.json')
-         order_id = len(orders) + 1  # Generate a new order ID
+ 
 
-         new_order = {
-             "id": order_id,
-             "type": form.type.data,
-             "crust": form.crust.data,
-             "size": form.size.data,
-             "quantity": form.quantity.data,
-             "price_per": 75.5,
-             "order_date" : str(form.order_date.data)
-             }
-
-
-
-         orders.append(new_order)
-         with open('./data/pizzaorders.json', 'w') as file:
-             json.dump( orders, file, indent=4)
-
-         return redirect(url_for('pizza_orders'))  
-     return render_template('order_form.html', form=form)           
 
 @app.route('/confirm', methods =['GET'])
 def delete():
+    if check_login_required():  # Ensure the user is logged in before showing the delete confirmation
+        return check_login_required()  # This will redirect to login if not logged in
+
     if request.method == 'GET':
         if request.args.get('order_id'):
-                orders =get_file('./data/pizzaorders.json')
+            orders = get_file('./data/pizzaorders.json')
+            del_order_id = int(request.args.get('order_id'))
 
-                del_order_id = int(request.args.get('order_id'))
-
-              
-
-                for order in orders:
-                    if order['id'] == del_order_id :
-                        return render_template('confirm_delete.html', order = order)
-    
+            for order in orders:
+                if order['id'] == del_order_id:
+                    return render_template('confirm_delete.html', order=order)
 
 if __name__ == '__main__':
     app.run(port=6005, debug=True)
-    app.run(port=(os.getenv('FLASK_RUN_PORT')), host=os.getenv('FLASK_RUN_HOST'))

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} <img src="./static/pizza_logo.png" alt="A pizza logo"> Ederroni's pizza{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Header -->
+    <header class="bg-gray-800 text-white py-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <a href="{{ url_for('pizza_orders') }}">
+            <h1 class="text-2xl font-bold text-red-500 flex items-center space-x-2">
+                
+                <img src="./static/pizza_logo.png" alt="A pizza logo" class="h-32 w-32 object-contain">
+                <span>Ederroni's pizza</span>
+            
+            </h1></a> <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="{{ url_for('logout') }}" class="hover:text-blue-400">Log out</a></li>
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <div class="container mx-auto mt-6 px-4">
+        <div class="bg-gray-800 text-white p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-blue-400">{% block page_title %}Page Title{% endblock %}</h2>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto mt-6 px-4">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-10 py-4

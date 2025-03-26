@@ -1,43 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }} <!-- CSRF token -->
+{% extends "base.html" %}
 
-        <label for="name">{{ form.name.label }}</label>
-        {{ form.name }}<br>
+{% block title %}Login{% endblock %}
 
-        <label for="email">{{ form.email.label }}</label>
-        {{ form.email }}<br>
+{% block page_title %}Welcome Back{% endblock %}
 
-        <label for="role">{{ form.role.label }}</label>
-        {{ form.role }}<br>
+{% block content %}
+<div class="flex justify-center items-center min-h-screen">
+    <div class="bg-gray-900 text-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center text-red-500">Login</h2>
+        
+        <form method="POST" class="mt-6">
+            {{ form.hidden_tag() }} <!-- CSRF token -->
 
-        <label for="password">{{ form.password.label }}</label>
-        {{ form.password }}<br>
+            {% if error %}
+                <div class="text-red-500 bg-red-100 p-3 rounded-lg mb-4">
+                    <strong>{{ error }}</strong>
+                </div>
+            {% endif %}
 
-        <input type="submit" value="Login">
-    </form>
-    <a href="{{ url_for('create ') }}">Create Account</a>
-    
-    {% if form.errors %}
-        <ul>
-            {% for field, errors in form.errors.items() %}
-                <li><strong>{{ field }}:</strong>
-                    <ul>
-                        {% for error in errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-</body>
-</html>
+            <div class="mb-4">
+                <label class="block text-gray-300 font-semibold">{{ form.name.label }}</label>
+                {{ form.name(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-300 font-semibold">{{ form.email.label }}</label>
+                {{ form.email(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-300 font-semibold">{{ form.role.label }}</label>
+                {{ form.role(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-300 font-semibold">{{ form.password.label }}</label>
+                {{ form.password(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-3 rounded-lg transition">
+                Login
+            </button>
+        </form>
+
+        <p class="text-center mt-4 text-gray-400">
+            Don't have an account? 
+            <a href="{{ url_for('create') }}" class="text-blue-400 hover:text-blue-300">Sign up here</a>
+        </p>
+
+        {% if form.errors %}
+        <div class="mt-4 p-4 bg-red-700 text-white rounded-lg">
+            <ul>
+                {% for field, errors in form.errors.items() %}
+                    <li><strong>{{ field }}</strong>:
+                        <ul class="list-disc ml-5">
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

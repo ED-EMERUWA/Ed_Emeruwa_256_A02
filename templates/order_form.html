@@ -1,37 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order a Pizza</title>
-</head>
-<body>
-    <h2>Order a New Pizza</h2>
-    
-    <form method="POST">
-        {{ form.hidden_tag() }}
+{% extends "base.html" %}
 
-        <label for="type">{{ form.type.label }}</label>
-        {{ form.type() }}<br><br>
+{% block title %}Order a Pizza{% endblock %}
 
-        <label for="crust">{{ form.crust.label }}</label>
-        {{ form.crust() }}<br><br>
+{% block page_title %}Place Your Pizza Order{% endblock %}
 
-        <label for="size">{{ form.size.label }}</label>
-        {{ form.size() }}<br><br>
+{% block content %}
+<div class="flex justify-center items-center min-h-screen bg-gray-900">
+    <div class="bg-gray-800 text-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 class="text-3xl font-bold text-center text-red-500">Order a New Pizza</h2>
+        
+        <form method="POST" class="mt-6 space-y-6">
+            {{ form.hidden_tag() }}
 
-        <label for="quantity">{{ form.quantity.label }}</label>
-        {{ form.quantity() }}<br><br>
+            <div class="space-y-2">
+                <label for="type" class="block text-gray-300 font-semibold">{{ form.type.label }}</label>
+                {{ form.type(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
 
-        <label for="order_date">{{ form.order_date.label }}</label>
-        {{ form.order_date() }}<br><br>
+            <div class="space-y-2">
+                <label for="crust" class="block text-gray-300 font-semibold">{{ form.crust.label }}</label>
+                {{ form.crust(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
 
-        {{ form.submit() }}
-    </form>
-    
-    <br>
-    <a href="{{ url_for('pizza_orders') }}">
-        <button style="padding:10px 15px; font-size:16px; cursor:pointer;">Back to Orders</button>
-    </a>
-</body>
-</html>
+            <div class="space-y-2">
+                <label for="size" class="block text-gray-300 font-semibold">{{ form.size.label }}</label>
+                {{ form.size(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <div class="space-y-2">
+                <label for="quantity" class="block text-gray-300 font-semibold">{{ form.quantity.label }}</label>
+                {{ form.quantity(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <div class="space-y-2">
+                <label for="order_date" class="block text-gray-300 font-semibold">{{ form.order_date.label }}</label>
+                {{ form.order_date(class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500") }}
+            </div>
+
+            <div class="space-y-4">
+                {{ form.submit(class="w-full bg-red-600 hover:bg-red-500 text-white py-3 px-6 rounded-lg transition") }}
+            </div>
+        </form>
+
+        <div class="mt-6 text-center">
+            <a href="{{ url_for('pizza_orders') }}" 
+               class="text-blue-400 hover:text-blue-300 text-sm underline">
+                Back to Orders
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,42 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizza Orders</title>
-</head>
-<body>
-    <h2>Pizza Orders</h2>
-    <table border="1">
-        <tr>
-            <th>Type</th>
-            <th>Crust</th>
-            <th>Size</th>
-            <th>Quantity</th>
-            <th>Price Per</th>
-            <th>Subtotal</th>
-            <th>Delivery Charge</th>
-            <th>Total</th>
-            <th>Order Date</th>
-            <th>Eidt</th>
-        </tr>
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.type }}</td>
-            <td>{{ order.crust }}</td>
-            <td>{{ order.size }}</td>
-            <td>{{ order.quantity }}</td>
-            <td>${{ "%.2f"|format(order.price_per) }}</td>
-            <td>${{ "%.2f"|format(order.subtotal) }}</td>
-            <td>${{ "%.2f"|format(order.delivery_charge) }}</td>
-            <td>${{ "%.2f"|format(order.total) }}</td>
-            <td>{{ order.order_date }}</td>
-            <td>{{order.id}}</td>
-            <td><a href="{{ url_for('pizza', order_id=order.id) }}"> Edit </a></td>
-            <td><a href="{{ url_for('delete', order_id=order.id) }}"> delete </a></td>
-        </tr>
-        {% endfor %}
-        <a href="{{ url_for('pizza') }}"> order </a>
+{% extends "base.html" %}
+
+{% block title %}Pizza Orders{% endblock %}
+
+{% block page_title %}Pizza Orders{% endblock %}
+
+{% block content %}
+<div class="overflow-x-auto">
+    {% if orders %}
+    <table class="w-full bg-gray-800 text-white rounded-lg shadow-lg">
+        <thead>
+            <tr class="bg-red-600 text-white text-lg">
+                <th class="py-4 px-6 text-left">Type</th>
+                <th class="py-4 px-6 text-left">Crust</th>
+                <th class="py-4 px-6 text-left">Size</th>
+                <th class="py-4 px-6 text-left">Qty</th>
+                <th class="py-4 px-6 text-left">Price Per</th>
+                <th class="py-4 px-6 text-left">Subtotal</th>
+                <th class="py-4 px-6 text-left">Delivery</th>
+                <th class="py-4 px-6 text-left">Total</th>
+                <th class="py-4 px-6 text-left">Date</th>
+                <th class="py-4 px-6 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700 transition-all duration-200">
+                <td class="py-4 px-6 font-semibold text-blue-400">{{ order.type }}</td>
+                <td class="py-4 px-6">{{ order.crust }}</td>
+                <td class="py-4 px-6">{{ order.size }}</td>
+                <td class="py-4 px-6 text-center">{{ order.quantity }}</td>
+                <td class="py-4 px-6 text-green-400">${{ "%.2f"|format(order.price_per) }}</td>
+                <td class="py-4 px-6 text-yellow-400">${{ "%.2f"|format(order.subtotal) }}</td>
+                <td class="py-4 px-6 text-red-400">${{ "%.2f"|format(order.delivery_charge) }}</td>
+                <td class="py-4 px-6 text-purple-400 font-bold">${{ "%.2f"|format(order.total) }}</td>
+                <td class="py-4 px-6">{{ order.order_date }}</td>
+                <td class="py-4 px-6 flex space-x-4 justify-center">
+                    <a href="{{ url_for('pizza', order_id=order.id) }}" 
+                       class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-1 px-3 rounded-lg shadow">
+                        Edit
+                    </a>
+                    <a href="{{ url_for('delete', order_id=order.id) }}" 
+                       class="bg-red-600 hover:bg-red-500 text-white font-semibold py-1 px-3 rounded-lg shadow">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-</body>
-</html>
+    <div class="mt-10 text-center">
+        <a href="{{ url_for('pizza') }}" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-8 rounded-lg shadow-lg">
+            Order a Pizza
+        </a>
+    </div>
+{% else %}
+    <p class="text-center text-xl text-gray-400 mt-6">No orders yet.</p>
+    <div class="mt-10 text-center">
+        <a href="{{ url_for('pizza') }}" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-8 rounded-lg shadow-lg text-3xl">
+            Order a Pizza
+        </a>
+    </div>
+{% endif %}
+
+</div>
+
+
+
+{% endblock %}
