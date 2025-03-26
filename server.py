@@ -112,7 +112,7 @@ def pizza_orders():
 
     return render_template('pizza_orders.html', orders=orders_list)
         
-@app.route('/pizza', methods=['GET', 'POST', 'PUT'])
+@app.route('/pizza', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def pizza():
     form = PizzaOrderForm()
     if request.method == 'GET':
@@ -151,16 +151,27 @@ def pizza():
 
          except Exception as e:
              return jsonify({"error": str(e)}), 500
-           
-                
+    elif request.method == 'DELETE':  
+        try:
+            del_order = request.get_json()
+            del_order_id = int(del_order["id"])
 
-                    
-                    
-                    
-# rey=turn edit form form sgpuld have default values of order when the form is submited the js gets all values turn to json and the backen replaces the order with that oneth at is returned
+            
+            with open('./data/pizzaorders.json', 'r') as file:
+                orders = json.load(file)
 
-         
-       
+            # Compresssion
+            orders = [order for order in orders if order["id"] != del_order_id]
+
+            
+            with open('./data/pizzaorders.json', 'w') as file:
+                json.dump(orders, file, indent=4)
+
+            return redirect(url_for('pizza_orders'))
+
+        except Exception as e:
+            return {"error": str(e)}, 500
+
     if request.method == 'POST':
      if form.validate_on_submit():
          orders = get_file('./data/pizzaorders.json')
@@ -182,11 +193,23 @@ def pizza():
          with open('./data/pizzaorders.json', 'w') as file:
              json.dump( orders, file, indent=4)
 
-         return redirect(url_for('pizza_orders'))  # Redirect to orders page
-
+         return redirect(url_for('pizza_orders'))  
      return render_template('order_form.html', form=form)           
 
+@app.route('/confirm', methods =['GET'])
+def delete():
+    if request.method == 'GET':
+        if request.args.get('order_id'):
+                orders =get_file('./data/pizzaorders.json')
 
+                del_order_id = int(request.args.get('order_id'))
+
+              
+
+                for order in orders:
+                    if order['id'] == del_order_id :
+                        return render_template('confirm_delete.html', order = order)
+    
 
 if __name__ == '__main__':
     app.run(port=6005, debug=True)

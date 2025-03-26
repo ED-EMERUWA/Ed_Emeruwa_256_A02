@@ -33,7 +33,7 @@
             <td>{{ order.order_date }}</td>
             <td>{{order.id}}</td>
             <td><a href="{{ url_for('pizza', order_id=order.id) }}"> Edit </a></td>
-            <td><a href="{{ url_for('delete', order_id=order.id) }}"> delete </a></td>td>
+            <td><a href="{{ url_for('delete', order_id=order.id) }}"> delete </a></td>
         </tr>
         {% endfor %}
         <a href="{{ url_for('pizza') }}"> order </a>
